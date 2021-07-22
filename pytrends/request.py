@@ -172,9 +172,13 @@ class TrendReq(object):
         }
 
         # build out json for each keyword
-        for kw in self.kw_list:
-            keyword_payload = {'keyword': kw, 'time': timeframe,
-                               'geo': self.geo}
+        if len(self.kw_list) != 0:
+            for kw in self.kw_list:
+                keyword_payload = {'keyword': kw, 'time': timeframe,
+                                   'geo': self.geo}
+                self.token_payload['req']['comparisonItem'].append(keyword_payload)
+        else:
+            keyword_payload = {'geo': self.geo, 'time': timeframe}
             self.token_payload['req']['comparisonItem'].append(keyword_payload)
         # requests will mangle this if it is not a string
         self.token_payload['req'] = json.dumps(self.token_payload['req'])
@@ -324,8 +328,8 @@ class TrendReq(object):
         result_dict = dict()
         for request_json in self.related_topics_widget_list:
             # ensure we know which keyword we are looking at rather than relying on order
-            kw = request_json['request']['restriction'][
-                'complexKeywordsRestriction']['keyword'][0]['value']
+            # kw = request_json['request']['restriction'][
+            #     'complexKeywordsRestriction']['keyword'][0]['value']
             # convert to string as requests will mangle
             related_payload['req'] = json.dumps(request_json['request'])
             related_payload['token'] = request_json['token']
@@ -359,7 +363,7 @@ class TrendReq(object):
                 # in case no rising topics are found, the lines above will throw a KeyError
                 df_rising = None
 
-            result_dict[kw] = {'rising': df_rising, 'top': df_top}
+            result_dict = {'rising': df_rising, 'top': df_top}
         return result_dict
 
     def related_queries(self):
@@ -373,8 +377,8 @@ class TrendReq(object):
         result_dict = dict()
         for request_json in self.related_queries_widget_list:
             # ensure we know which keyword we are looking at rather than relying on order
-            kw = request_json['request']['restriction'][
-                'complexKeywordsRestriction']['keyword'][0]['value']
+            # kw = request_json['request']['restriction'][
+            #     'complexKeywordsRestriction']['keyword'][0]['value']
             # convert to string as requests will mangle
             related_payload['req'] = json.dumps(request_json['request'])
             related_payload['token'] = request_json['token']
@@ -406,7 +410,7 @@ class TrendReq(object):
                 # in case no rising queries are found, the lines above will throw a KeyError
                 rising_df = None
 
-            result_dict[kw] = {'top': top_df, 'rising': rising_df}
+            result_dict = {'top': top_df, 'rising': rising_df}
         return result_dict
 
     def trending_searches(self, pn='united_states'):
